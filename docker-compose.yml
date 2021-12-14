@@ -1,0 +1,15 @@
+version: '2'
+services:
+  # App Proxy
+  proxy:
+    build: ./proxy
+    ports:
+    - '3000:3000'
+  # App Auth Portal
+  auth:
+    build: ./auth
+    ports:
+      - '1337:3000'
+  # App Web UI
+  web:
+    build: ./web
