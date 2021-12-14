@@ -123,7 +123,7 @@ app.post('/login', async (req, res) => {
     const check = await authenticate(req.body.email, req.body.password, users);
 
     if(!check) {
-        res.redirect(encodeURI(`/login?url=${req.body.redirect}&error=Invalid email/password!`));
+        res.redirect(encodeURI(`/login?host=${req.body.host}&url=${req.body.redirect}&error=Invalid email/password!`));
         return;
     }
 
