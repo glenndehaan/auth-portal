@@ -21,7 +21,7 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies
-RUN npm ci
+RUN npm ci --only=production
 
 #
 # Setup app
