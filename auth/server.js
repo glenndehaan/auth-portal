@@ -109,6 +109,7 @@ app.get('/login', (req, res) => {
     res.render('index', {
         error: typeof req.query.error === 'string' && req.query.error !== '',
         error_text: req.query.error || '',
+        host: req.query.host,
         redirect: req.query.url,
         image: `bg-${random(1, 6)}.jpg`,
         app_title,
@@ -126,10 +127,10 @@ app.post('/login', async (req, res) => {
         return;
     }
 
-    res.cookie('__auth_portal', jwt.sign({email: req.body.email}, jwt_settings.secret, {
+    res.redirect(`${req.body.host}/sso/redirect?redirect=${req.body.redirect}&jwt=${jwt.sign({email: req.body.email}, jwt_settings.secret, {
         algorithm: jwt_settings.algorithm,
         expiresIn: jwt_settings.expiresIn
-    })).redirect(req.body.redirect);
+    })}`);
 });
 
 /**
