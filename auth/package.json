@@ -14,9 +14,12 @@
   "dependencies": {
     "apache-crypt": "^1.2.5",
     "apache-md5": "^1.1.7",
+    "atob": "^2.1.2",
+    "btoa": "^1.2.1",
     "cookie-parser": "^1.4.6",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
+    "googleapis": "^92.0.0",
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.4",
     "simple-node-logger": "^21.8.12",

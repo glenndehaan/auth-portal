@@ -6,7 +6,15 @@ const multer = require('multer');
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
+const atob = require('atob');
+const btoa = require('btoa');
+const google = require('googleapis').google;
 const app = express();
+
+/**
+ * Define Google OAuth Client
+ */
+const GOAuth2 = google.auth.OAuth2;
 
 /**
  * Import own modules
@@ -45,6 +53,15 @@ const logo_url = process.env.LOGO_URL || 'https://glenndehaan.com';
 const info_banner = process.env.INFO_BANNER || '';
 const email_placeholder = process.env.EMAIL_PLACEHOLDER || 'user@example.com';
 const users = process.env.USERS || 'user@example.com:$apr1$jI2jqzEg$MyNJQxhcZFNygXP79xT/p.\n';
+const provider_google = process.env.PROVIDER_GOOGLE || false;
+const provider_google_client_id = process.env.PROVIDER_GOOGLE_CLIENT_ID || '';
+const provider_google_client_secret = process.env.PROVIDER_GOOGLE_CLIENT_SECRET || '';
+const provider_google_domain = process.env.PROVIDER_GOOGLE_DOMAIN || '';
+const provider_google_scopes = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'openid'
+];
 
 /**
  * Define global functions
@@ -126,6 +143,7 @@ app.get('/login', (req, res) => {
         logo,
         logo_url,
         email_placeholder,
+        provider_google,
         sid: uuidv4()
     });
 });
@@ -142,6 +160,62 @@ app.post('/login', async (req, res) => {
         expiresIn: jwt_settings.expiresIn
     })}`);
 });
+
+/**
+ * Configure OAuth Provider
+ */
+if(provider_google) {
+    app.get('/provider/google', (req, res) => {
+        // Create an OAuth2 client object from the credentials in our config file
+        const oauth2Client = new GOAuth2(provider_google_client_id, provider_google_client_secret, `${req.protocol}://${req.get('host')}/provider/google/callback`);
+
+        // Obtain the google login link to which we'll send our users to give us access
+        const loginLink = oauth2Client.generateAuthUrl({
+            access_type: 'offline', // Indicates that we need to be able to access data continously without the user constantly giving us consent
+            scope: provider_google_scopes, // Using the access scopes from our config file
+            state: btoa(JSON.stringify({
+                host: req.query.host,
+                redirect: req.query.redirect
+            }))
+        });
+
+        return res.redirect(loginLink);
+    });
+
+    app.get('/provider/google/callback', (req, res) => {
+        // Decode state
+        const state = JSON.parse(atob(req.query.state));
+
+        // Create an OAuth2 client object from the credentials in our config file
+        const oauth2Client = new GOAuth2(provider_google_client_id, provider_google_client_secret, `${req.protocol}://${req.get('host')}/provider/google/callback`);
+
+        if (req.query.error) {
+            res.redirect(encodeURI(`/login?host=${state.host}&url=${state.redirect}&error=An error occurred during the connection to Google!`));
+        } else {
+            oauth2Client.getToken(req.query.code, (err, token) => {
+                if (err) return res.redirect(encodeURI(`/login?host=${state.host}&url=${state.redirect}&error=An error occurred during the verification with Google!`));
+
+                oauth2Client.credentials = token;
+                const service = google.oauth2('v2');
+
+                service.userinfo.get({
+                    auth: oauth2Client
+                }).then(response => {
+                    if(typeof provider_google_domain === 'string' && provider_google_domain !== '') {
+                        if(provider_google_domain !== response.data.hd) {
+                            return res.redirect(encodeURI(`/login?host=${state.host}&url=${state.redirect}&error=This domain is not allowed!`));
+                        }
+                    }
+
+                    res.redirect(`${state.host}/sso/redirect?redirect=${state.redirect}&jwt=${jwt.sign({email: response.data.email}, jwt_settings.secret, {
+                        algorithm: jwt_settings.algorithm,
+                        expiresIn: jwt_settings.expiresIn
+                    })}`);
+                });
+            });
+        }
+    });
+}
 
 /**
  * Setup default 404 message

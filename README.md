@@ -40,6 +40,11 @@ services:
       #EMAIL_PLACEHOLDER: user@github.com
       # To create more users run `htpasswd -nm username` then copy the result into here. To specify multiple users add a `\n` after each string
       #USERS: "user@example.com:$apr1$jI2jqzEg$MyNJQxhcZFNygXP79xT/p.\n"
+      # Google OAuth Config
+      #PROVIDER_GOOGLE: true
+      #PROVIDER_GOOGLE_CLIENT_ID: xxxxxxxxxx
+      #PROVIDER_GOOGLE_CLIENT_SECRET: xxxxxxxxxx
+      #PROVIDER_GOOGLE_DOMAIN: example.com
 ```
 
 * Run `docker-compose up -d` this pulls the auth portal and starts it headless
