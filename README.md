@@ -2,7 +2,7 @@
 
 [![Image Size](https://img.shields.io/docker/image-size/glenndehaan/auth-portal)](https://hub.docker.com/r/glenndehaan/auth-portal)
 
-![Auth Portal Login](https://user-images.githubusercontent.com/7496187/146155131-99b9f704-4300-4cf4-aed9-57cd2d0fe6f8.png)
+![Auth Portal Login](https://user-images.githubusercontent.com/7496187/146245327-e22daf75-2fe3-4008-a462-9ac7288f6d1b.png)
 
 ## What is it?
 This auth portal can be seen as a prettified basic auth.
