@@ -2,6 +2,14 @@
 
 [![Image Size](https://img.shields.io/docker/image-size/glenndehaan/auth-portal)](https://hub.docker.com/r/glenndehaan/auth-portal)
 
+![Auth Portal Login](https://user-images.githubusercontent.com/7496187/146155131-99b9f704-4300-4cf4-aed9-57cd2d0fe6f8.png)
+
+## What is it?
+This auth portal can be seen as a prettified basic auth.
+Through the nginx auth module we check if a user is authorized to access an app.
+People who are not authorized are redirected to an SSO style login screen, where they can log in with an email address and password.
+Users are stored in the Apache Basic Authentication format.
+
 ## Development Usage
 Make sure you have Node.JS 14.x installed then run the following commands in your terminal:
 ```
@@ -127,3 +135,34 @@ server {
     }
 }
 ```
+
+## App user access
+If you would like your app to have access to the currently logged-in users email address
+Added the following line to your proxy or cgi process:
+
+### Proxy
+```
+proxy_set_header Remote-User $auth_user;
+```
+
+In express, you are now able to retrieve the user like this:
+```javascript
+app.get('/', (req, res) => {
+    res.send(`Hello, ${req.headers['remote-user']}!`);
+});
+```
+
+### CGI Process
+```
+fastcgi_param REMOTE_USER $auth_user;
+```
+
+In PHP, you are now able to retrieve the user like this:
+```php
+<?php
+echo 'Hello, ' . $_SERVER['REMOTE_USER'] . '!';
+```
+
+## License
+
+MIT
