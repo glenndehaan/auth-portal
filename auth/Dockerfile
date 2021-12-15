@@ -23,6 +23,9 @@ COPY . .
 # Install dependencies
 RUN npm ci --only=production
 
+# Create production build
+RUN npm run build
+
 #
 # Setup app
 #

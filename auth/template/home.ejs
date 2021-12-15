@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Home | <%= app_title %></title>
+
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui">
+
+        <link rel="shortcut icon" href="/images/favicon.ico">
+
+        <link rel="preload" href="/images/logo_edit.png" as="image">
+        <link rel="preload" href="/dist/style.css" as="style">
+        <link href="/dist/style.css" rel="stylesheet">
+    </head>
+    <body class="bg-white dark:bg-neutral-900 dark:text-gray-100 h-screen">
+        <div class="w-full flex flex-wrap">
+            <div class="w-full flex flex-col">
+                <div class="flex justify-center pt-12">
+                    <a href="https://github.com/glenndehaan/auth-portal-example"><img class="h-20 w-20" src="/images/logo_edit.png"/></a>
+                </div>
+
+                <div class="flex flex-col justify-center my-auto pt-8 px-8 lg:px-32">
+                    <p class="text-center text-3xl">Auth Portal</p>
+                </div>
+                <div class="text-center pt-12 pb-12">
+                    <p>
+                        Powered by: <a href="https://glenndehaan.com" class="underline font-semibold">Glenn de Haan</a>.<br/>
+                        Want your own portal? Checkout the project on: <a href="https://github.com/glenndehaan/auth-portal-example" class="underline font-semibold">GitHub</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

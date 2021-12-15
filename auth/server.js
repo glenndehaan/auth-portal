@@ -5,6 +5,7 @@ const express = require('express');
 const multer = require('multer');
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
 const app = express();
 
 /**
@@ -39,8 +40,9 @@ const jwt_settings = {
 };
 const app_title = process.env.APP_TITLE || 'Auth Portal';
 const app_header = process.env.APP_HEADER || 'Welcome';
-const logo = process.env.LOGO || '/images/logo.png';
+const logo = process.env.LOGO || '/images/logo_edit.png';
 const logo_url = process.env.LOGO_URL || 'https://glenndehaan.com';
+const info_banner = process.env.INFO_BANNER || '';
 const email_placeholder = process.env.EMAIL_PLACEHOLDER || 'user@example.com';
 const users = process.env.USERS || 'user@example.com:$apr1$jI2jqzEg$MyNJQxhcZFNygXP79xT/p.\n';
 
@@ -86,6 +88,11 @@ app.use(express.static(`${__dirname}/public`));
 /**
  * Configure routers
  */
+app.get('/', (req, res) => {
+    res.render('home', {
+        app_title
+    });
+});
 app.get('/validate', (req, res) => {
     if(req.cookies && req.cookies.__auth_portal) {
         try {
@@ -106,17 +113,20 @@ app.get('/validate', (req, res) => {
     res.set('X-Auth-Portal-JWT', '').set('X-Auth-Portal-Error', '').set('X-Auth-Portal-User', '').status(401).send();
 });
 app.get('/login', (req, res) => {
-    res.render('index', {
+    res.render('login', {
         error: typeof req.query.error === 'string' && req.query.error !== '',
         error_text: req.query.error || '',
+        info: typeof info_banner === 'string' && info_banner !== '',
+        info_text: info_banner,
         host: req.query.host,
         redirect: req.query.url,
-        image: `bg-${random(1, 6)}.jpg`,
+        banner_image: process.env.BANNER_IMAGE || `/images/bg-${random(1, 10)}.jpg`,
         app_title,
         app_header,
         logo,
         logo_url,
-        email_placeholder
+        email_placeholder,
+        sid: uuidv4()
     });
 });
 app.post('/login', async (req, res) => {
