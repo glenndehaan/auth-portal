@@ -1,4 +1,4 @@
-# Auth Portal Example
+# Auth Portal
 
 [![Image Size](https://img.shields.io/docker/image-size/glenndehaan/auth-portal)](https://hub.docker.com/r/glenndehaan/auth-portal)
 
