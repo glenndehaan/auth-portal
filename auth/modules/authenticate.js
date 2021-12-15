@@ -1,6 +1,7 @@
 /**
  * Import vendor modules
  */
+const fs = require('fs');
 const md5 = require('apache-md5');
 const crypt = require('apache-crypt');
 const crypto = require('crypto');
@@ -47,26 +48,38 @@ const checkPassword = (digest, password) => {
  * @param username
  * @param password
  * @param htpasswd
+ * @param json
+ * @param useJson
  * @returns {Promise<unknown>}
  */
-const authenticate = (username, password, htpasswd) => {
+const authenticate = (username, password, htpasswd, json, useJson= false) => {
     return new Promise((resolve) => {
-        const lines = htpasswd.split('\n');
+        if(!useJson) {
+            const lines = htpasswd.split('\n');
 
-        lines.forEach((line) => {
-            const splitLine = line.split(':');
-            if (splitLine[0] === username) {
-                resolve(checkPassword(splitLine[1], password));
-            }
-        });
+            lines.forEach((line) => {
+                const splitLine = line.split(':');
+                if (splitLine[0] === username) {
+                    resolve(checkPassword(splitLine[1], password));
+                }
+            });
 
-        resolve(false);
+            resolve(false);
+        } else {
+            const lines = JSON.parse(fs.readFileSync(json, 'utf-8'));
+
+            lines.forEach((line) => {
+                if (line.email === username) {
+                    resolve(checkPassword(line.password, password));
+                }
+            });
+
+            resolve(false);
+        }
     });
 };
 
 /**
  * Export authenticate module
- *
- * @type {function(*=, *=, *): Promise<unknown>}
  */
 module.exports = authenticate;

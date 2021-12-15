@@ -29,8 +29,14 @@ services:
     image: glenndehaan/auth-portal
     ports:
       - '9897:3000'
+    # Optional Volume for JSON users
+    #volumes:
+    #  - './db:/db'
     # Optional Settings
     #environment:
+      #
+      # General App Settings
+      #
       #APP_TITLE: Auth Portal
       #APP_HEADER: Welcome
       #LOGO: https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/2048px-Octicons-mark-github.svg.png
@@ -38,13 +44,29 @@ services:
       #BANNER_IMAGE: https://images.unsplash.com/photo-1619976336288-38db38e4c503?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80
       #INFO_BANNER: For more info contact the IT team
       #EMAIL_PLACEHOLDER: user@github.com
+
+      #
+      # User Settings
+      #
       # To create more users run `htpasswd -nm username` then copy the result into here. To specify multiple users add a `\n` after each string
       #USERS: "user@example.com:$apr1$jI2jqzEg$MyNJQxhcZFNygXP79xT/p.\n"
+      # If you want to use a JSON file for users enable this option, also make sure the volume is mounted so you can update the JSON on the host machine
+      #USERS_JSON: 'true'
+
+      #
+      # OAuth Provider Settings
+      #
       # Google OAuth Config
-      #PROVIDER_GOOGLE: true
+      #PROVIDER_GOOGLE: 'true'
       #PROVIDER_GOOGLE_CLIENT_ID: xxxxxxxxxx
       #PROVIDER_GOOGLE_CLIENT_SECRET: xxxxxxxxxx
       #PROVIDER_GOOGLE_DOMAIN: example.com
+
+      #
+      # JWT (JsonWebToken) Settings
+      #
+      #JWT_SECRET: xxxxxxxxxx
+      #JWT_EXPIRATION: '24h'
 ```
 
 * Run `docker-compose up -d` this pulls the auth portal and starts it headless

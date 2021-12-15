@@ -10,3 +10,7 @@ node_modules
 
 # Build output
 auth/public/dist
+
+# Database
+auth/db.json
+db.json

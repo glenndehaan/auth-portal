@@ -1,6 +1,7 @@
 /**
  * Import base packages
  */
+const fs = require('fs');
 const express = require('express');
 const multer = require('multer');
 const cookieParser = require('cookie-parser');
@@ -41,10 +42,11 @@ log.setLevel(dev ? 'trace' : 'info');
 /**
  * Define global variables
  */
+const json_path = dev ? `${__dirname}/db.json` : '/db/db.json';
 const jwt_settings = {
     algorithm: 'HS512',
-    secret: 'ehKf5rmcLWkfeuTaTdbyZXZmVQQUAXdMWZ9R5fcJrCsgqGkdLUHXyTaARzeH',
-    expiresIn: '24h'
+    secret: process.env.JWT_SECRET || 'ehKf5rmcLWkfeuTaTdbyZXZmVQQUAXdMWZ9R5fcJrCsgqGkdLUHXyTaARzeH',
+    expiresIn: process.env.JWT_EXPIRATION || '24h'
 };
 const app_title = process.env.APP_TITLE || 'Auth Portal';
 const app_header = process.env.APP_HEADER || 'Welcome';
@@ -53,6 +55,7 @@ const logo_url = process.env.LOGO_URL || 'https://glenndehaan.com';
 const info_banner = process.env.INFO_BANNER || '';
 const email_placeholder = process.env.EMAIL_PLACEHOLDER || 'user@example.com';
 const users = process.env.USERS || 'user@example.com:$apr1$jI2jqzEg$MyNJQxhcZFNygXP79xT/p.\n';
+const users_json = process.env.USERS_JSON || false;
 const provider_google = process.env.PROVIDER_GOOGLE || false;
 const provider_google_client_id = process.env.PROVIDER_GOOGLE_CLIENT_ID || '';
 const provider_google_client_secret = process.env.PROVIDER_GOOGLE_CLIENT_SECRET || '';
@@ -67,6 +70,24 @@ const provider_google_scopes = [
  * Define global functions
  */
 const random = (min, max) => Math.floor(Math.random() * (max - min)) + min;
+
+/**
+ * Initialize DB
+ */
+if(users_json) {
+    if(!fs.existsSync(json_path)) {
+        log.info('Database Initialized!');
+
+        fs.writeFileSync(json_path, JSON.stringify([
+            {
+                email: 'user@example.com',
+                password: '$apr1$jI2jqzEg$MyNJQxhcZFNygXP79xT/p.',
+                created: 0
+            }
+        ]));
+        fs.chmodSync(json_path, '666');
+    }
+}
 
 /**
  * Trust proxy
@@ -148,7 +169,7 @@ app.get('/login', (req, res) => {
     });
 });
 app.post('/login', async (req, res) => {
-    const check = await authenticate(req.body.email, req.body.password, users);
+    const check = await authenticate(req.body.email, req.body.password, users, json_path, users_json);
 
     if(!check) {
         res.redirect(encodeURI(`/login?host=${req.body.host}&url=${req.body.redirect}&error=Invalid email/password!`));
