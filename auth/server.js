@@ -49,7 +49,6 @@ const jwt_settings = {
     expiresIn: process.env.JWT_EXPIRATION || '24h'
 };
 const app_title = process.env.APP_TITLE || 'Auth Portal';
-const app_header = process.env.APP_HEADER || 'Welcome';
 const logo = process.env.LOGO || '/images/logo_edit.png';
 const logo_url = process.env.LOGO_URL || 'https://glenndehaan.com';
 const info_banner = process.env.INFO_BANNER || '';
@@ -151,6 +150,9 @@ app.get('/validate', (req, res) => {
     res.set('X-Auth-Portal-JWT', '').set('X-Auth-Portal-Error', '').set('X-Auth-Portal-User', '').status(401).send();
 });
 app.get('/login', (req, res) => {
+    const hour = new Date().getHours();
+    const timeHeader = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
+
     res.render('login', {
         error: typeof req.query.error === 'string' && req.query.error !== '',
         error_text: req.query.error || '',
@@ -160,7 +162,7 @@ app.get('/login', (req, res) => {
         redirect: req.query.url,
         banner_image: process.env.BANNER_IMAGE || `/images/bg-${random(1, 10)}.jpg`,
         app_title,
-        app_header,
+        app_header: process.env.APP_HEADER || timeHeader,
         logo,
         logo_url,
         email_placeholder,
