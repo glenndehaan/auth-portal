@@ -50,8 +50,10 @@ services:
       #
       # To create more users run `htpasswd -nm username` then copy the result into here. To specify multiple users add a `\n` after each string
       #USERS: "user@example.com:$apr1$jI2jqzEg$MyNJQxhcZFNygXP79xT/p.\n"
-      # If you want to use a JSON file for users enable this option, also make sure the volume is mounted so you can update the JSON on the host machine
+      # If you want to use a JSON file for users enable this option, also make sure the volume is mounted so you can update the JSON on the host machine. This also enables the user activation flow
       #USERS_JSON: 'true'
+      # Enables the /admin portal for managing JSON users. Caution: This portal is by default open. We recommend to protect it with for example an IP block.
+      #USERS_JSON_ADMIN: 'true'
 
       #
       # OAuth Provider Settings
@@ -88,6 +90,7 @@ server {
         proxy_set_header        X-Forwarded-For    $proxy_add_x_forwarded_for;
         proxy_set_header        X-Forwarded-Host   $host;
         proxy_set_header        X-Forwarded-Server $host;
+        proxy_set_header        X-Forwarded-Proto  $scheme;
     }
 }
 ```
@@ -191,6 +194,16 @@ In PHP, you are now able to retrieve the user like this:
 <?php
 echo 'Hello, ' . $_SERVER['REMOTE_USER'] . '!';
 ```
+
+## Google OAuth Provider
+* Create a project within Google's Cloud portal: https://console.cloud.google.com
+* Set up the OAuth consent screen. Next ensure the following scopes are selected:
+
+![Screenshot-20211216092824-798x724](https://user-images.githubusercontent.com/7496187/146335615-c67cddce-1710-4f6f-997a-5b251f9f2f6e.png)
+
+* Create a new OAuth credential and set up the authorized redirects as follows:
+
+![Screenshot-20211216093330-632x769](https://user-images.githubusercontent.com/7496187/146336217-a77069ab-cb42-4e79-8806-cef7e221d75c.png)
 
 ## License
 

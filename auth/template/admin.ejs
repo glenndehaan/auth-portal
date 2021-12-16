@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Admin | <%= app_title %></title>
+
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui">
+
+        <link rel="shortcut icon" href="/images/favicon.ico">
+
+        <link rel="preload" href="/images/logo_edit.png" as="image">
+        <link rel="preload" href="/dist/style.css" as="style">
+        <link href="/dist/style.css" rel="stylesheet">
+    </head>
+    <body class="bg-gray-50 dark:bg-gray-900">
+        <main class="h-full overflow-y-auto">
+            <div class="container px-6 mx-auto grid">
+                <a href="/admin">
+                    <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
+                        Auth Portal Admin
+                    </h2>
+                </a>
+                <div class="grid gap-6 mb-8 md:grid-cols-2">
+                    <div class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+                        <div class="p-3 mr-4 text-orange-500 bg-orange-100 rounded-full dark:text-orange-100 dark:bg-orange-500">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                                Total users
+                            </p>
+                            <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                                <%= db.length %>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+                        <form class="flex flex-col" action="/admin/create" method="post" enctype="multipart/form-data">
+                            <div class="flex flex-col">
+                                <label for="email" class="text-lg dark:text-gray-200">Email</label>
+                                <input type="email" id="email" name="email" placeholder="<%= email_placeholder %>" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mt-1 leading-tight focus:outline-none focus:shadow-outline dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
+                            </div>
+
+                            <input type="submit" value="Create User" class="bg-black text-white font-bold text-lg hover:bg-gray-700 p-2 mt-8 cursor-pointer transition-colors dark:text-black dark:bg-gray-200 dark:hover:bg-white">
+                        </form>
+                    </div>
+                </div>
+
+                <% if(info) { %>
+                    <div class="bg-blue-500 text-white p-3 mb-8 rounded shadow-lg flex items-center">
+                        <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                        <div><%= info_text %></div>
+                    </div>
+                <% } %>
+
+                <div class="w-full overflow-hidden rounded-lg shadow-xs">
+                    <div class="w-full overflow-x-auto">
+                        <table class="w-full whitespace-no-wrap">
+                            <thead>
+                                <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+                                    <th class="px-4 py-3">Email</th>
+                                    <th class="px-4 py-3">Status</th>
+                                    <th class="px-4 py-3">Added</th>
+                                    <th class="px-4 py-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+                                <% db.forEach((user) => { %>
+                                    <tr class="text-gray-700 dark:text-gray-400">
+                                        <td class="px-4 py-3">
+                                            <%= user.email %>
+                                        </td>
+                                        <td class="px-4 py-3 text-xs">
+                                            <% if(user.activation === null) { %>
+                                                <span class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">
+                                                    Active
+                                                </span>
+                                            <% } %>
+                                            <% if(user.activation !== null) { %>
+                                                <span class="px-2 py-1 font-semibold leading-tight text-gray-700 bg-gray-100 rounded-full dark:text-gray-100 dark:bg-gray-700">
+                                                    Inactive
+                                                </span>
+                                            <% } %>
+                                        </td>
+                                        <td class="px-4 py-3 text-xs">
+                                            <%= new Date(user.created).toLocaleTimeString('en-US', { hour: '2-digit', minute:'2-digit', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC', timeZoneName: 'short', hour12: false }) %>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm flex space-x-4">
+                                            <a href="/admin/reset?email=<%= encodeURIComponent(user.email) %>">
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 0 24 24" width="30px" class="fill-orange-400 hover:fill-orange-300">
+                                                    <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                                                </svg>
+                                            </a>
+                                            <a href="/admin/delete?email=<%= encodeURIComponent(user.email) %>">
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 0 24 24" width="30px" class="fill-red-500 hover:fill-red-400">
+                                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z"/>
+                                                </svg>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

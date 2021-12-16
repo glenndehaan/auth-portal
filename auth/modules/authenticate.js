@@ -80,6 +80,16 @@ const authenticate = (username, password, htpasswd, json, useJson= false) => {
 };
 
 /**
+ * Hash a password that is htpasswd compatible
+ *
+ * @param password
+ * @returns {string|*}
+ */
+const hash = (password) => {
+    return md5(password);
+}
+
+/**
  * Export authenticate module
  */
-module.exports = authenticate;
+module.exports = {authenticate, hash};

@@ -20,7 +20,7 @@ const GOAuth2 = google.auth.OAuth2;
 /**
  * Import own modules
  */
-const authenticate = require('./modules/authenticate');
+const {authenticate, hash} = require('./modules/authenticate');
 
 /**
  * Check if we are using the dev version
@@ -55,6 +55,7 @@ const info_banner = process.env.INFO_BANNER || '';
 const email_placeholder = process.env.EMAIL_PLACEHOLDER || 'user@example.com';
 const users = process.env.USERS || 'user@example.com:$apr1$jI2jqzEg$MyNJQxhcZFNygXP79xT/p.\n';
 const users_json = process.env.USERS_JSON || false;
+const users_json_admin = process.env.USERS_JSON_ADMIN || false;
 const provider_google = process.env.PROVIDER_GOOGLE || false;
 const provider_google_client_id = process.env.PROVIDER_GOOGLE_CLIENT_ID || '';
 const provider_google_client_secret = process.env.PROVIDER_GOOGLE_CLIENT_SECRET || '';
@@ -81,6 +82,7 @@ if(users_json) {
             {
                 email: 'user@example.com',
                 password: '$apr1$jI2jqzEg$MyNJQxhcZFNygXP79xT/p.',
+                activation: null,
                 created: 0
             }
         ]));
@@ -241,11 +243,149 @@ if(provider_google) {
 }
 
 /**
+ * Configure activate endpoint
+ */
+if(users_json) {
+    app.get('/activate/:uuid', (req, res) => {
+        const db = JSON.parse(fs.readFileSync(json_path, 'utf-8'));
+        const find = db.filter((user) => {
+            return user.activation === req.params.uuid;
+        });
+
+        if(find.length < 1) {
+            res.status(404);
+            res.send('Not Found!');
+
+            return;
+        }
+
+        res.render('activate', {
+            info: typeof info_banner === 'string' && info_banner !== '',
+            info_text: info_banner,
+            banner_image: process.env.BANNER_IMAGE || `/images/bg-${random(1, 10)}.jpg`,
+            app_title,
+            app_header: 'Activate Your Account',
+            logo,
+            logo_url,
+            email: find[0].email,
+            uuid: req.params.uuid,
+            sid: uuidv4()
+        });
+    });
+
+    app.post('/activate', (req, res) => {
+        const db = JSON.parse(fs.readFileSync(json_path, 'utf-8'));
+        const find = db.filter((user) => {
+            return user.activation === req.body.uuid;
+        });
+
+        if(find.length < 1) {
+            res.status(404);
+            res.send('Not Found!');
+
+            return;
+        }
+
+        const updatedDb = db.map((user) => {
+            if(user.activation === req.body.uuid) {
+                return {
+                    ...user,
+                    activation: null,
+                    password: hash(req.body.password)
+                }
+            }
+
+            return user;
+        });
+
+        fs.writeFileSync(json_path, JSON.stringify(updatedDb));
+
+        res.render('activate_success', {
+            info: typeof info_banner === 'string' && info_banner !== '',
+            info_text: info_banner,
+            banner_image: process.env.BANNER_IMAGE || `/images/bg-${random(1, 10)}.jpg`,
+            app_title,
+            app_header: 'Success',
+            logo,
+            logo_url,
+            sid: uuidv4()
+        });
+    });
+
+    if(users_json_admin) {
+        app.get('/admin', (req, res) => {
+            const db = JSON.parse(fs.readFileSync(json_path, 'utf-8'));
+
+            res.render('admin', {
+                info: typeof req.query.message === 'string' && req.query.message !== '',
+                info_text: req.query.message || '',
+                app_title,
+                logo,
+                logo_url,
+                email_placeholder,
+                db
+            });
+        });
+
+        app.post('/admin/create', (req, res) => {
+            const token = uuidv4();
+            const db = JSON.parse(fs.readFileSync(json_path, 'utf-8'));
+
+            db.push({
+                email: req.body.email,
+                password: '',
+                activation: token,
+                created: new Date().getTime()
+            });
+
+            fs.writeFileSync(json_path, JSON.stringify(db));
+
+            res.redirect(encodeURI(`/admin?message=New user has been added: ${req.body.email}! URL: ${req.protocol}://${req.get('host')}/activate/${token}`));
+        });
+
+        app.get('/admin/reset', (req, res) => {
+            const email = decodeURIComponent(req.query.email);
+            const token = uuidv4();
+            const db = JSON.parse(fs.readFileSync(json_path, 'utf-8'));
+
+            const updatedDb = db.map((user) => {
+                if (user.email === email) {
+                    return {
+                        ...user,
+                        activation: token,
+                        password: ''
+                    }
+                }
+
+                return user;
+            });
+
+            fs.writeFileSync(json_path, JSON.stringify(updatedDb));
+
+            res.redirect(encodeURI(`/admin?message=New activation link has been generated for: ${email}! URL: ${req.protocol}://${req.get('host')}/activate/${token}`));
+        });
+
+        app.get('/admin/delete', (req, res) => {
+            const email = decodeURIComponent(req.query.email);
+            const db = JSON.parse(fs.readFileSync(json_path, 'utf-8'));
+
+            const updatedDb = db.filter((user) => {
+                return user.email !== email;
+            });
+
+            fs.writeFileSync(json_path, JSON.stringify(updatedDb));
+
+            res.redirect(encodeURI(`/admin?message=${email} has been removed!`));
+        });
+    }
+}
+
+/**
  * Setup default 404 message
  */
 app.use((req, res) => {
     res.status(404);
-    res.send('Not Found!')
+    res.send('Not Found!');
 });
 
 /**

@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon --watch . --exec 'node server.js'",
+    "dev": "nodemon --watch . --ignore db.json --exec 'node server.js'",
     "tailwind": "tailwindcss -i ./css/style.css -o ./public/dist/style.css --watch",
     "build": "tailwindcss -i ./css/style.css -o ./public/dist/style.css --minify"
   },
