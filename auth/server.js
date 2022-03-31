@@ -136,8 +136,6 @@ app.get('/', (req, res) => {
     });
 });
 app.get('/validate', (req, res) => {
-    console.log('req.headers', req.headers);
-
     if(req.cookies && req.cookies.__auth_portal) {
         try {
             const check = jwt.verify(req.cookies.__auth_portal, jwt_settings.secret);
@@ -147,7 +145,7 @@ app.get('/validate', (req, res) => {
                 if(!enable_direct_redirect) {
                     res.set('X-Auth-Portal-Error', 'Invalid or expired login!').set('X-Auth-Portal-User', '').status(401).send();
                 } else {
-                    res.redirect(`${auth_url}?host=${req.headers['X-Forwarded-Proto']}://${req.headers['X-Forwarded-Host']}&url=${req.headers['X-Forwarded-Proto']}://${req.headers['X-Forwarded-Host']}${req.headers['X-Forwarded-Uri']}`)
+                    res.redirect(`${auth_url}?host=${req.get('X-Forwarded-Proto')}://${req.get('X-Forwarded-Host')}&url=${req.get('X-Forwarded-Proto')}://${req.get('X-Forwarded-Host')}${req.get('X-Forwarded-Uri')}`);
                 }
             }
 
@@ -156,7 +154,7 @@ app.get('/validate', (req, res) => {
             if(!enable_direct_redirect) {
                 res.set('X-Auth-Portal-Error', 'Invalid or expired login!').set('X-Auth-Portal-User', '').status(401).send();
             } else {
-                res.redirect(`${auth_url}?host=${req.headers['X-Forwarded-Proto']}://${req.headers['X-Forwarded-Host']}&url=${req.headers['X-Forwarded-Proto']}://${req.headers['X-Forwarded-Host']}${req.headers['X-Forwarded-Uri']}`)
+                res.redirect(`${auth_url}?host=${req.get('X-Forwarded-Proto')}://${req.get('X-Forwarded-Host')}&url=${req.get('X-Forwarded-Proto')}://${req.get('X-Forwarded-Host')}${req.get('X-Forwarded-Uri')}`);
             }
             return;
         }
@@ -165,7 +163,7 @@ app.get('/validate', (req, res) => {
     if(!enable_direct_redirect) {
         res.set('X-Auth-Portal-Error', '').set('X-Auth-Portal-User', '').status(401).send();
     } else {
-        res.redirect(`${auth_url}?host=${req.headers['X-Forwarded-Proto']}://${req.headers['X-Forwarded-Host']}&url=${req.headers['X-Forwarded-Proto']}://${req.headers['X-Forwarded-Host']}${req.headers['X-Forwarded-Uri']}`)
+        res.redirect(`${auth_url}?host=${req.get('X-Forwarded-Proto')}://${req.get('X-Forwarded-Host')}&url=${req.get('X-Forwarded-Proto')}://${req.get('X-Forwarded-Host')}${req.get('X-Forwarded-Uri')}`);
     }
 });
 app.get('/login', (req, res) => {
