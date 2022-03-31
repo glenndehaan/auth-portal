@@ -163,6 +163,54 @@ server {
 }
 ```
 
+## Using a Traefik loadbalancer
+Below you will find a traefik docker compose example file:
+```yaml
+version: '3.8'
+
+services:
+  traefik:
+    image: traefik:v2.6
+    command:
+      - --providers.docker
+      # Don't expose containers per default
+      - --providers.docker.exposedByDefault=false
+      - --providers.docker.swarmMode=true
+      # Entrypoints (ports) for the routers
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      # Logging
+      - --accesslog
+      - --log.level=debug
+      # Enable the dashboard
+      - --api
+      ## Traefik Pilot
+      - --pilot.dashboard=false
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        # traefik.enable is required because we don't expose all containers automatically
+        - traefik.enable=true
+
+        # Extra middlewares
+        - traefik.http.middlewares.traefik-auth-portal.forwardauth.address=https://login.example.com/validate
+        - traefik.http.middlewares.traefik-auth-portal.forwardauth.trustForwardHeader=true
+        - traefik.http.middlewares.traefik-auth-portal.forwardauth.authResponseHeaders=X-Auth-Portal-User
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
+```
+
 ## App user access
 If you would like your app to have access to the currently logged-in users email address
 Added the following line to your proxy or cgi process:
