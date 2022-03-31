@@ -105,7 +105,6 @@ server {
 # Any request to this server will first be sent to this URL
 auth_request /sso;
 auth_request_set $auth_user $upstream_http_x_auth_portal_user;
-auth_request_set $auth_resp_jwt $upstream_http_x_auth_portal_jwt;
 auth_request_set $auth_resp_err $upstream_http_x_auth_portal_error;
 
 location = /sso {
@@ -118,16 +117,9 @@ location = /sso {
     proxy_set_header X-Forwarded-Proto $scheme;
 }
 
-location = /sso/redirect {
-    auth_request off;
-
-    add_header Set-Cookie "__auth_portal=$arg_jwt;Path=/;";
-    return 302 $arg_redirect;
-}
-
 error_page 401 = @error401;
 location @error401 {
-    return 302 https://login.example.com/login?host=$scheme://$http_host&url=$scheme://$http_host$request_uri&jwt=$auth_resp_jwt&error=$auth_resp_err;
+    return 302 https://login.example.com/login?host=$scheme://$http_host&url=$scheme://$http_host$request_uri&error=$auth_resp_err;
 }
 ```
 
@@ -146,7 +138,6 @@ server {
     # Any request to this server will first be sent to this URL
     auth_request /sso;
     auth_request_set $auth_user $upstream_http_x_auth_portal_user;
-    auth_request_set $auth_resp_jwt $upstream_http_x_auth_portal_jwt;
     auth_request_set $auth_resp_err $upstream_http_x_auth_portal_error;
 
     location = /sso {
@@ -159,16 +150,9 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    location = /sso/redirect {
-        auth_request off;
-
-        add_header Set-Cookie "__auth_portal=$arg_jwt;Path=/;";
-        return 302 $arg_redirect;
-    }
-
     error_page 401 = @error401;
     location @error401 {
-        return 302 https://login.example.com/login?host=$scheme://$http_host&url=$scheme://$http_host$request_uri&jwt=$auth_resp_jwt&error=$auth_resp_err;
+        return 302 https://login.example.com/login?host=$scheme://$http_host&url=$scheme://$http_host$request_uri&error=$auth_resp_err;
     }
 }
 ```

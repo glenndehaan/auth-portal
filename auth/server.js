@@ -184,10 +184,7 @@ app.post('/login', async (req, res) => {
     res.cookie('__auth_portal', jwt.sign({email: req.body.email}, jwt_settings.secret, {
         algorithm: jwt_settings.algorithm,
         expiresIn: jwt_settings.expiresIn
-    }), {httpOnly: true, secure: true, domain: cookie_domain}).redirect(`${req.body.host}/sso/redirect?redirect=${req.body.redirect}&jwt=${jwt.sign({email: req.body.email}, jwt_settings.secret, {
-        algorithm: jwt_settings.algorithm,
-        expiresIn: jwt_settings.expiresIn
-    })}`);
+    }), {httpOnly: true, secure: true, domain: cookie_domain}).redirect(req.body.redirect);
 });
 
 /**
@@ -239,10 +236,7 @@ if(provider_google) {
                     res.cookie('__auth_portal', jwt.sign({email: response.data.email}, jwt_settings.secret, {
                         algorithm: jwt_settings.algorithm,
                         expiresIn: jwt_settings.expiresIn
-                    }), {httpOnly: true, secure: true, domain: cookie_domain}).redirect(`${state.host}/sso/redirect?redirect=${state.redirect}&jwt=${jwt.sign({email: response.data.email}, jwt_settings.secret, {
-                        algorithm: jwt_settings.algorithm,
-                        expiresIn: jwt_settings.expiresIn
-                    })}`);
+                    }), {httpOnly: true, secure: true, domain: cookie_domain}).redirect(state.redirect);
                 });
             });
         }
