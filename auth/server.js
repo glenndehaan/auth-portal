@@ -236,7 +236,7 @@ if(provider_google) {
                         }
                     }
 
-                    res.cookie('__auth_portal', jwt.sign({email: req.body.email}, jwt_settings.secret, {
+                    res.cookie('__auth_portal', jwt.sign({email: response.data.email}, jwt_settings.secret, {
                         algorithm: jwt_settings.algorithm,
                         expiresIn: jwt_settings.expiresIn
                     }), {httpOnly: true, secure: true, domain: cookie_domain}).redirect(`${state.host}/sso/redirect?redirect=${state.redirect}&jwt=${jwt.sign({email: response.data.email}, jwt_settings.secret, {
