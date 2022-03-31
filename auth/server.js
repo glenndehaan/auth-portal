@@ -53,6 +53,8 @@ const logo = process.env.LOGO || '/images/logo_edit.png';
 const logo_url = process.env.LOGO_URL || 'https://glenndehaan.com';
 const info_banner = process.env.INFO_BANNER || '';
 const email_placeholder = process.env.EMAIL_PLACEHOLDER || 'user@example.com';
+const enable_direct_redirect = process.env.ENABLE_DIRECT_REDIRECT || false;
+const auth_url = process.env.AUTH_URL || '';
 const cookie_domain = process.env.COOKIE_DOMAIN || '';
 const users = process.env.USERS || 'user@example.com:$apr1$jI2jqzEg$MyNJQxhcZFNygXP79xT/p.\n';
 const users_json = process.env.USERS_JSON || false;
@@ -138,19 +140,31 @@ app.get('/validate', (req, res) => {
         try {
             const check = jwt.verify(req.cookies.__auth_portal, jwt_settings.secret);
             if(check) {
-                res.set('X-Auth-Portal-JWT', req.cookies.__auth_portal).set('X-Auth-Portal-Error', '').set('X-Auth-Portal-User', check.email).status(200).send();
+                res.set('X-Auth-Portal-Error', '').set('X-Auth-Portal-User', check.email).status(200).send();
             } else {
-                res.set('X-Auth-Portal-JWT', req.cookies.__auth_portal).set('X-Auth-Portal-Error', 'Invalid or expired login!').set('X-Auth-Portal-User', '').status(401).send();
+                if(!enable_direct_redirect) {
+                    res.set('X-Auth-Portal-Error', 'Invalid or expired login!').set('X-Auth-Portal-User', '').status(401).send();
+                } else {
+                    res.redirect(`${auth_url}?host=${req.headers['X-Forwarded-Proto']}://${req.headers['X-Forwarded-Host']}&url=${req.headers['X-Forwarded-Proto']}://${req.headers['X-Forwarded-Host']}${req.headers['X-Forwarded-Uri']}`)
+                }
             }
 
             return;
         } catch (e) {
-            res.set('X-Auth-Portal-JWT', req.cookies.__auth_portal).set('X-Auth-Portal-Error', 'Invalid or expired login!').set('X-Auth-Portal-User', '').status(401).send();
+            if(!enable_direct_redirect) {
+                res.set('X-Auth-Portal-Error', 'Invalid or expired login!').set('X-Auth-Portal-User', '').status(401).send();
+            } else {
+                res.redirect(`${auth_url}?host=${req.headers['X-Forwarded-Proto']}://${req.headers['X-Forwarded-Host']}&url=${req.headers['X-Forwarded-Proto']}://${req.headers['X-Forwarded-Host']}${req.headers['X-Forwarded-Uri']}`)
+            }
             return;
         }
     }
 
-    res.set('X-Auth-Portal-JWT', '').set('X-Auth-Portal-Error', '').set('X-Auth-Portal-User', '').status(401).send();
+    if(!enable_direct_redirect) {
+        res.set('X-Auth-Portal-Error', '').set('X-Auth-Portal-User', '').status(401).send();
+    } else {
+        res.redirect(`${auth_url}?host=${req.headers['X-Forwarded-Proto']}://${req.headers['X-Forwarded-Host']}&url=${req.headers['X-Forwarded-Proto']}://${req.headers['X-Forwarded-Host']}${req.headers['X-Forwarded-Uri']}`)
+    }
 });
 app.get('/login', (req, res) => {
     const hour = new Date().getHours();

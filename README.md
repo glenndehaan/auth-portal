@@ -46,6 +46,12 @@ services:
       #EMAIL_PLACEHOLDER: user@github.com
 
       #
+      # Auth behaviour Settings (Used for loadbalancers like: Traefik, since they forward the redirect)
+      #
+      #ENABLE_DIRECT_REDIRECT: true
+      #AUTH_URL: https://login.example.com/login
+
+      #
       # Cookie Settings
       #
       #COOKIE_DOMAIN: example.com
