@@ -46,6 +46,11 @@ services:
       #EMAIL_PLACEHOLDER: user@github.com
 
       #
+      # Cookie Settings
+      #
+      #COOKIE_DOMAIN: example.com
+
+      #
       # User Settings
       #
       # To create more users run `htpasswd -nm username` then copy the result into here. To specify multiple users add a `\n` after each string

@@ -53,6 +53,7 @@ const logo = process.env.LOGO || '/images/logo_edit.png';
 const logo_url = process.env.LOGO_URL || 'https://glenndehaan.com';
 const info_banner = process.env.INFO_BANNER || '';
 const email_placeholder = process.env.EMAIL_PLACEHOLDER || 'user@example.com';
+const cookie_domain = process.env.COOKIE_DOMAIN || '';
 const users = process.env.USERS || 'user@example.com:$apr1$jI2jqzEg$MyNJQxhcZFNygXP79xT/p.\n';
 const users_json = process.env.USERS_JSON || false;
 const users_json_admin = process.env.USERS_JSON_ADMIN || false;
@@ -180,7 +181,10 @@ app.post('/login', async (req, res) => {
         return;
     }
 
-    res.redirect(`${req.body.host}/sso/redirect?redirect=${req.body.redirect}&jwt=${jwt.sign({email: req.body.email}, jwt_settings.secret, {
+    res.cookie('__auth_portal', jwt.sign({email: req.body.email}, jwt_settings.secret, {
+        algorithm: jwt_settings.algorithm,
+        expiresIn: jwt_settings.expiresIn
+    }), {httpOnly: true, secure: true, domain: cookie_domain}).redirect(`${req.body.host}/sso/redirect?redirect=${req.body.redirect}&jwt=${jwt.sign({email: req.body.email}, jwt_settings.secret, {
         algorithm: jwt_settings.algorithm,
         expiresIn: jwt_settings.expiresIn
     })}`);
@@ -232,7 +236,10 @@ if(provider_google) {
                         }
                     }
 
-                    res.redirect(`${state.host}/sso/redirect?redirect=${state.redirect}&jwt=${jwt.sign({email: response.data.email}, jwt_settings.secret, {
+                    res.cookie('__auth_portal', jwt.sign({email: req.body.email}, jwt_settings.secret, {
+                        algorithm: jwt_settings.algorithm,
+                        expiresIn: jwt_settings.expiresIn
+                    }), {httpOnly: true, secure: true, domain: cookie_domain}).redirect(`${state.host}/sso/redirect?redirect=${state.redirect}&jwt=${jwt.sign({email: response.data.email}, jwt_settings.secret, {
                         algorithm: jwt_settings.algorithm,
                         expiresIn: jwt_settings.expiresIn
                     })}`);
