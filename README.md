@@ -48,7 +48,7 @@ services:
       #
       # Auth behaviour Settings (Used for loadbalancers like: Traefik, since they forward the redirect)
       #
-      #ENABLE_DIRECT_REDIRECT: true
+      #ENABLE_DIRECT_REDIRECT: 'true'
       #AUTH_URL: https://login.example.com/login
 
       #

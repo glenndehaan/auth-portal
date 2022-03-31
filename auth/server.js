@@ -136,6 +136,8 @@ app.get('/', (req, res) => {
     });
 });
 app.get('/validate', (req, res) => {
+    console.log('req.headers', req.headers);
+
     if(req.cookies && req.cookies.__auth_portal) {
         try {
             const check = jwt.verify(req.cookies.__auth_portal, jwt_settings.secret);
