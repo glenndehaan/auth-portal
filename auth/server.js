@@ -55,6 +55,7 @@ const info_banner = process.env.INFO_BANNER || '';
 const email_placeholder = process.env.EMAIL_PLACEHOLDER || 'user@example.com';
 const enable_direct_redirect = process.env.ENABLE_DIRECT_REDIRECT || false;
 const auth_url = process.env.AUTH_URL || '';
+const cookie_name = process.env.COOKIE_NAME || '__auth_portal';
 const cookie_domain = process.env.COOKIE_DOMAIN || '';
 const users = process.env.USERS || 'user@example.com:$apr1$jI2jqzEg$MyNJQxhcZFNygXP79xT/p.\n';
 const users_json = process.env.USERS_JSON || false;
@@ -136,9 +137,9 @@ app.get('/', (req, res) => {
     });
 });
 app.get('/validate', (req, res) => {
-    if(req.cookies && req.cookies.__auth_portal) {
+    if(req.cookies && req.cookies[cookie_name]) {
         try {
-            const check = jwt.verify(req.cookies.__auth_portal, jwt_settings.secret);
+            const check = jwt.verify(req.cookies[cookie_name], jwt_settings.secret);
             if(check) {
                 res.set('X-Auth-Portal-Error', '').set('X-Auth-Portal-User', check.email).status(200).send();
             } else {
@@ -195,7 +196,7 @@ app.post('/login', async (req, res) => {
         return;
     }
 
-    res.cookie('__auth_portal', jwt.sign({email: req.body.email}, jwt_settings.secret, {
+    res.cookie(cookie_name, jwt.sign({email: req.body.email}, jwt_settings.secret, {
         algorithm: jwt_settings.algorithm,
         expiresIn: jwt_settings.expiresIn
     }), {httpOnly: true, secure: true, domain: cookie_domain}).redirect(req.body.redirect);
@@ -247,7 +248,7 @@ if(provider_google) {
                         }
                     }
 
-                    res.cookie('__auth_portal', jwt.sign({email: response.data.email}, jwt_settings.secret, {
+                    res.cookie(cookie_name, jwt.sign({email: response.data.email}, jwt_settings.secret, {
                         algorithm: jwt_settings.algorithm,
                         expiresIn: jwt_settings.expiresIn
                     }), {httpOnly: true, secure: true, domain: cookie_domain}).redirect(state.redirect);

@@ -37,24 +37,25 @@ services:
       #
       # General App Settings
       #
-      #APP_TITLE: Auth Portal
-      #APP_HEADER: Welcome
-      #LOGO: https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/2048px-Octicons-mark-github.svg.png
-      #LOGO_URL: https://github.com
-      #BANNER_IMAGE: https://images.unsplash.com/photo-1619976336288-38db38e4c503?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80
-      #INFO_BANNER: For more info contact the IT team
-      #EMAIL_PLACEHOLDER: user@github.com
+      #APP_TITLE: 'Auth Portal'
+      #APP_HEADER: 'Welcome'
+      #LOGO: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/2048px-Octicons-mark-github.svg.png'
+      #LOGO_URL: 'https://github.com'
+      #BANNER_IMAGE: 'https://images.unsplash.com/photo-1619976336288-38db38e4c503?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80'
+      #INFO_BANNER: 'For more info contact the IT team'
+      #EMAIL_PLACEHOLDER: 'user@github.com'
 
       #
       # Auth behaviour Settings (Used for loadbalancers like: Traefik, since they forward the redirect)
       #
       #ENABLE_DIRECT_REDIRECT: 'true'
-      #AUTH_URL: https://login.example.com/login
+      #AUTH_URL: 'https://login.example.com/login'
 
       #
       # Cookie Settings
       #
-      #COOKIE_DOMAIN: example.com
+      #COOKIE_NAME: '__auth_portal'
+      #COOKIE_DOMAIN: 'example.com'
 
       #
       # User Settings
@@ -71,14 +72,14 @@ services:
       #
       # Google OAuth Config
       #PROVIDER_GOOGLE: 'true'
-      #PROVIDER_GOOGLE_CLIENT_ID: xxxxxxxxxx
-      #PROVIDER_GOOGLE_CLIENT_SECRET: xxxxxxxxxx
-      #PROVIDER_GOOGLE_DOMAIN: example.com
+      #PROVIDER_GOOGLE_CLIENT_ID: 'xxxxxxxxxx'
+      #PROVIDER_GOOGLE_CLIENT_SECRET: 'xxxxxxxxxx'
+      #PROVIDER_GOOGLE_DOMAIN: 'example.com'
 
       #
       # JWT (JsonWebToken) Settings
       #
-      #JWT_SECRET: xxxxxxxxxx
+      #JWT_SECRET: 'xxxxxxxxxx'
       #JWT_EXPIRATION: '24h'
 ```
 
