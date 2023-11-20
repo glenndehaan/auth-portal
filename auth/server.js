@@ -199,7 +199,7 @@ app.post('/login', async (req, res) => {
     res.cookie(cookie_name, jwt.sign({email: req.body.email}, jwt_settings.secret, {
         algorithm: jwt_settings.algorithm,
         expiresIn: jwt_settings.expiresIn
-    }), {httpOnly: true, secure: true, domain: cookie_domain}).redirect(req.body.redirect);
+    }), {httpOnly: true, secure: true, sameSite: 'none', domain: cookie_domain}).redirect(req.body.redirect);
 });
 
 /**
@@ -251,7 +251,7 @@ if(provider_google) {
                     res.cookie(cookie_name, jwt.sign({email: response.data.email}, jwt_settings.secret, {
                         algorithm: jwt_settings.algorithm,
                         expiresIn: jwt_settings.expiresIn
-                    }), {httpOnly: true, secure: true, domain: cookie_domain}).redirect(state.redirect);
+                    }), {httpOnly: true, secure: true, sameSite: 'none', domain: cookie_domain}).redirect(state.redirect);
                 });
             });
         }
